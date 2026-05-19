@@ -23,7 +23,7 @@ venv/
 # Data and outputs (large files)
 data/yelp/
 data/ml-*/
-sailrec/outputs/
+sasrec_injection/outputs/
 
 # LaTeX build artifacts
 paper/*.aux

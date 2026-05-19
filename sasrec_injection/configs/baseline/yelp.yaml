@@ -1,0 +1,24 @@
+# SASRec baseline on Yelp (Table 4).
+# Run: uv run python sasrec_injection/scripts/train_baseline.py \
+#        --config sasrec_injection/configs/baseline/yelp.yaml --seeds 42 7 18
+dataset:
+  name: "yelp"
+  min_interactions: 5
+model:
+  embed_dim: 50
+  num_blocks: 2
+  num_heads: 1
+  max_seq_len: 200
+  dropout: 0.2
+training:
+  batch_size: 512
+  lr: 0.001
+  max_epochs: 200
+  early_stopping_patience: 10
+  early_stopping_metric: "ndcg@10"
+  early_stopping_min_delta: 0.001
+evaluation:
+  num_neg_samples: 100
+  ks: [5, 10, 20]
+seeds: [42, 7, 18]
+output_dir: "sasrec_injection/outputs/baseline/yelp"

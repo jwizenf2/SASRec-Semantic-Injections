@@ -19,16 +19,16 @@ Yelp data requires a manual download due to licensing:
    - `data/yelp/yelp_academic_dataset_business.json`
 3. Run the preparation script:
    ```bash
-   uv run python sailrec/scripts/prepare_yelp.py
+   uv run python sasrec_injection/scripts/prepare_yelp.py
    ```
 
 ## LLM Embeddings
 
-Pre-computed Qwen3-Embedding-0.6B embeddings are stored under `sailrec/outputs/embeddings/` and are NOT tracked in git (large binary files). To regenerate them for a dataset, run:
+Pre-computed Qwen3-Embedding-0.6B embeddings are stored under `sasrec_injection/outputs/embeddings/` and are NOT tracked in git (large binary files). To regenerate them for a dataset, run:
 
 ```bash
-uv run python sailrec/scripts/extract_llm_embeddings.py \
-    --config sailrec/configs/cross_dataset/beauty.yaml
+uv run python sasrec_injection/scripts/extract_llm_embeddings.py \
+    --config sasrec_injection/configs/cross_dataset/beauty.yaml
 ```
 
-This requires `mlx-lm` (Apple Silicon) or a compatible LLM inference backend. The extraction must be run once per dataset before training SAILRec models.
+This requires `mlx-lm` (Apple Silicon) or a compatible LLM inference backend. The extraction must be run once per dataset before training ItemTable models.

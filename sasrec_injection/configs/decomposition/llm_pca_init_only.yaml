@@ -1,0 +1,29 @@
+# Table 5 row 2 / Figure 3 "LLM-PCA init" — LLM-PCA initialization, no alignment loss.
+# Item embedding table initialized from top-50 PCA components of Qwen3 embeddings;
+# no auxiliary loss during training. Tests whether initialization geometry alone is
+# sufficient (it lifts overall but not tail as far as the full method).
+# Run: uv run python sasrec_injection/scripts/train_llm_init.py \
+#        --config sasrec_injection/configs/decomposition/llm_pca_init_only.yaml \
+#        --seeds 42 7 18
+dataset:
+  name: "amazon-Video_Games"
+  min_interactions: 5
+model:
+  embed_dim: 50
+  num_blocks: 2
+  num_heads: 1
+  max_seq_len: 200
+  dropout: 0.2
+training:
+  batch_size: 512
+  lr: 0.001
+  max_epochs: 200
+  early_stopping_patience: 10
+  early_stopping_metric: "ndcg@10"
+  early_stopping_min_delta: 0.0001
+evaluation:
+  num_neg_samples: 100
+  ks: [5, 10, 20]
+seeds: [42, 7, 18]
+output_dir: "sasrec_injection/outputs/decomposition/llm_pca_init_only"
+llm_embeddings_path: "sasrec_injection/outputs/embeddings/video_games.pt"

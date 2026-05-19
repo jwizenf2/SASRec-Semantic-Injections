@@ -18,8 +18,8 @@ SASRec-Semantic-Injections/
 │   ├── checklist.tex
 │   └── figures/
 │
-├── sailrec/                              # code (internal package name)
-│   ├── src/sailrec/
+├── sasrec_injection/                              # code (internal package name)
+│   ├── src/sasrec_injection/
 │   │   ├── alignment/contrastive.py      # InfoNCE alignment loss + projector
 │   │   ├── data/                         # dataset loaders (Amazon, Yelp, MovieLens)
 │   │   ├── models/                       # SASRec, BERT4Rec, GRU4Rec
@@ -30,12 +30,12 @@ SASRec-Semantic-Injections/
 │   │
 │   ├── scripts/
 │   │   ├── extract_llm_embeddings.py     # one-time LLM embedding extraction
-│   │   ├── train_p1.py                   # SASRec baseline
-│   │   ├── train_sailrec.py              # item-table integration (main method)
-│   │   ├── train_a1_llm_init.py          # ablation: LLM-PCA init, no alignment
-│   │   ├── train_a2_input_fusion.py      # surface: encoder input fusion
-│   │   ├── train_a3_hidden_distill.py    # surface: per-position distillation
-│   │   ├── train_a4_seq_infonce.py       # surface: sequence-level InfoNCE
+│   │   ├── train_baseline.py             # SASRec baseline
+│   │   ├── train_item_table.py           # item-table integration (main method)
+│   │   ├── train_llm_init.py             # ablation: LLM-PCA init, no alignment
+│   │   ├── train_input_fusion.py         # surface: encoder input fusion
+│   │   ├── train_hidden_distill.py       # surface: per-position distillation
+│   │   ├── train_seq_alignment.py        # surface: sequence-level InfoNCE
 │   │   ├── eval_fullrank.py
 │   │   ├── eval_stratified.py
 │   │   ├── eval_stratified_sampled.py
@@ -71,7 +71,7 @@ uv sync
 
 Or with pip: `pip install -e .`
 
-**Apple Silicon note:** Training defaults to `mps`. Set `device: cpu` in `sailrec/configs/base.yaml` for Linux, or `device: cuda` for NVIDIA. The embedding extraction script (`extract_llm_embeddings.py`) uses `mlx-lm` and requires Apple Silicon; on other hardware swap in a compatible inference backend for that step.
+**Apple Silicon note:** Training defaults to `mps`. Set `device: cpu` in `sasrec_injection/configs/base.yaml` for Linux, or `device: cuda` for NVIDIA. The embedding extraction script (`extract_llm_embeddings.py`) uses `mlx-lm` and requires Apple Silicon; on other hardware swap in a compatible inference backend for that step.
 
 ---
 
@@ -98,11 +98,11 @@ All datasets use a 5-core filter and leave-one-out split.
 
 ### 1. Extract LLM embeddings (once per dataset)
 
-Embeddings come from `Qwen3-Embedding-0.6B` via `mlx-lm`, cached to `sailrec/outputs/embeddings/<dataset>.pt`.
+Embeddings come from `Qwen3-Embedding-0.6B` via `mlx-lm`, cached to `sasrec_injection/outputs/embeddings/<dataset>.pt`.
 
 ```bash
-uv run python sailrec/scripts/extract_llm_embeddings.py \
-    --config sailrec/configs/cross_surface/surface_d_item_table.yaml
+uv run python sasrec_injection/scripts/extract_llm_embeddings.py \
+    --config sasrec_injection/configs/cross_surface/surface_d_item_table.yaml
 ```
 
 Repeat with a config from each dataset (the dataset name is read from the config).
@@ -110,53 +110,53 @@ Repeat with a config from each dataset (the dataset name is read from the config
 ### 2. SASRec baselines (Table 3 row 1, Table 4 baselines)
 
 ```bash
-uv run python sailrec/scripts/train_p1.py \
-    --config sailrec/configs/baseline/video_games.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_baseline.py \
+    --config sasrec_injection/configs/baseline/video_games.yaml --seeds 42 7 18
 
-uv run python sailrec/scripts/train_p1.py \
-    --config sailrec/configs/baseline/sports.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_baseline.py \
+    --config sasrec_injection/configs/baseline/sports.yaml --seeds 42 7 18
 
-uv run python sailrec/scripts/train_p1.py \
-    --config sailrec/configs/baseline/beauty.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_baseline.py \
+    --config sasrec_injection/configs/baseline/beauty.yaml --seeds 42 7 18
 
-uv run python sailrec/scripts/train_p1.py \
-    --config sailrec/configs/baseline/yelp.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_baseline.py \
+    --config sasrec_injection/configs/baseline/yelp.yaml --seeds 42 7 18
 ```
 
 ### 3. Cross-surface ablation on Video Games (Table 3)
 
 ```bash
 # Surface A: encoder input fusion
-uv run python sailrec/scripts/train_a2_input_fusion.py \
-    --config sailrec/configs/cross_surface/surface_a_input_fusion.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_input_fusion.py \
+    --config sasrec_injection/configs/cross_surface/surface_a_input_fusion.yaml --seeds 42 7 18
 
 # Surface B: per-position distillation
-uv run python sailrec/scripts/train_a3_hidden_distill.py \
-    --config sailrec/configs/cross_surface/surface_b_per_position_distill.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_hidden_distill.py \
+    --config sasrec_injection/configs/cross_surface/surface_b_per_position_distill.yaml --seeds 42 7 18
 
 # Surface C: sequence-level InfoNCE alignment
-uv run python sailrec/scripts/train_a4_seq_infonce.py \
-    --config sailrec/configs/cross_surface/surface_c_seq_alignment.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_seq_alignment.py \
+    --config sasrec_injection/configs/cross_surface/surface_c_seq_alignment.yaml --seeds 42 7 18
 
 # Surface D: item-table integration (our method)
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/cross_surface/surface_d_item_table.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/cross_surface/surface_d_item_table.yaml \
     --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
 ```
 
 ### 4. Cross-dataset generalization of item-table integration (Table 4)
 
 ```bash
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/cross_dataset/sports.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/cross_dataset/sports.yaml \
     --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
 
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/cross_dataset/beauty.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/cross_dataset/beauty.yaml \
     --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
 
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/cross_dataset/yelp.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/cross_dataset/yelp.yaml \
     --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
 ```
 
@@ -164,16 +164,16 @@ uv run python sailrec/scripts/train_sailrec.py \
 
 ```bash
 # LLM-PCA initialization only
-uv run python sailrec/scripts/train_a1_llm_init.py \
-    --config sailrec/configs/decomposition/llm_pca_init_only.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_llm_init.py \
+    --config sasrec_injection/configs/decomposition/llm_pca_init_only.yaml --seeds 42 7 18
 
 # Uniform InfoNCE alignment (no frequency weighting)
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/decomposition/uniform_alignment.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/decomposition/uniform_alignment.yaml --seeds 42 7 18
 
 # Frequency-weighted InfoNCE alignment (full method)
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/decomposition/freq_weighted_alignment.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/decomposition/freq_weighted_alignment.yaml \
     --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
 ```
 
@@ -181,12 +181,12 @@ uv run python sailrec/scripts/train_sailrec.py \
 
 ```bash
 # Appendix C — weight-function sweep
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/appendix/weight_fn_sweep.yaml --seeds 42 7 18
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/appendix/weight_fn_sweep.yaml --seeds 42 7 18
 
 # Appendix D — λ sweep
-uv run python sailrec/scripts/train_sailrec.py \
-    --config sailrec/configs/appendix/lambda_sweep.yaml \
+uv run python sasrec_injection/scripts/train_item_table.py \
+    --config sasrec_injection/configs/appendix/lambda_sweep.yaml \
     --seeds 42 7 18 --llm-init --freq-weight \
     --lambdas 0.01 0.05 0.1 0.5 1.0
 ```
@@ -194,11 +194,11 @@ uv run python sailrec/scripts/train_sailrec.py \
 ### 7. Evaluation
 
 ```bash
-uv run python sailrec/scripts/eval_fullrank.py \
-    --config sailrec/configs/cross_dataset/beauty.yaml
+uv run python sasrec_injection/scripts/eval_fullrank.py \
+    --config sasrec_injection/configs/cross_dataset/beauty.yaml
 
-uv run python sailrec/scripts/eval_stratified_sampled.py \
-    --config sailrec/configs/cross_dataset/beauty.yaml
+uv run python sasrec_injection/scripts/eval_stratified_sampled.py \
+    --config sasrec_injection/configs/cross_dataset/beauty.yaml
 ```
 
 ---

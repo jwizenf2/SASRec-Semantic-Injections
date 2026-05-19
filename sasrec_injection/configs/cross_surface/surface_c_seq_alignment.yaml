@@ -1,0 +1,35 @@
+# Table 3 / Appendix B — Surface C: Sequence-level InfoNCE alignment on Video Games.
+# A single user summary vector is aligned against a mean-pooled LLM catalog embedding.
+# λ=0.5 selected on VG NDCG@10.
+# Run: uv run python sasrec_injection/scripts/train_seq_alignment.py \
+#        --config sasrec_injection/configs/cross_surface/surface_c_seq_alignment.yaml \
+#        --seeds 42 7 18
+dataset:
+  name: "amazon-Video_Games"
+  min_interactions: 5
+model:
+  embed_dim: 50
+  num_blocks: 2
+  num_heads: 1
+  max_seq_len: 200
+  dropout: 0.2
+training:
+  batch_size: 512
+  lr: 0.001
+  max_epochs: 200
+  early_stopping_patience: 10
+  early_stopping_metric: "ndcg@10"
+  early_stopping_min_delta: 0.001
+evaluation:
+  num_neg_samples: 100
+  ks: [5, 10, 20]
+align:
+  embeddings_path: "sasrec_injection/outputs/embeddings/video_games.pt"
+  lambda_align: 0.5
+  temperature: 0.1
+  projector_hidden_dim: 0
+  projector_dropout: 0.1
+  llm_dim: 1024
+  max_align_ids: 4096
+seeds: [42, 7, 18]
+output_dir: "sasrec_injection/outputs/cross_surface/surface_c_seq_alignment"
