@@ -1,0 +1,24 @@
+# SASRec baseline on Beauty & Personal Care (Table 4).
+# Run: uv run python sailrec/scripts/train_p1.py \
+#        --config sailrec/configs/baseline/beauty.yaml --seeds 42 7 18
+dataset:
+  name: "amazon-Beauty_and_Personal_Care"
+  min_interactions: 5
+model:
+  embed_dim: 50
+  num_blocks: 2
+  num_heads: 1
+  max_seq_len: 200
+  dropout: 0.2
+training:
+  batch_size: 512
+  lr: 0.001
+  max_epochs: 200
+  early_stopping_patience: 10
+  early_stopping_metric: "ndcg@10"
+  early_stopping_min_delta: 0.001
+evaluation:
+  num_neg_samples: 100
+  ks: [5, 10, 20]
+seeds: [42, 7, 18]
+output_dir: "sailrec/outputs/baseline/beauty"

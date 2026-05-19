@@ -1,0 +1,34 @@
+# Table 4 — Item-table integration on Yelp (held-out generalization).
+# LLM-PCA initialization + frequency-weighted binary InfoNCE alignment, λ=0.5.
+# Run: uv run python sailrec/scripts/train_sailrec.py \
+#        --config sailrec/configs/cross_dataset/yelp.yaml \
+#        --seeds 42 7 18 --llm-init --freq-weight --weight-fn binary
+dataset:
+  name: "yelp"
+  min_interactions: 5
+model:
+  embed_dim: 50
+  num_blocks: 2
+  num_heads: 1
+  max_seq_len: 200
+  dropout: 0.2
+training:
+  batch_size: 512
+  lr: 0.001
+  max_epochs: 200
+  early_stopping_patience: 10
+  early_stopping_metric: "ndcg@10"
+  early_stopping_min_delta: 0.001
+evaluation:
+  num_neg_samples: 100
+  ks: [5, 10, 20]
+align:
+  embeddings_path: "sailrec/outputs/embeddings/yelp.pt"
+  lambda_align: 0.5
+  temperature: 0.1
+  projector_hidden_dim: 0
+  projector_dropout: 0.1
+  llm_dim: 1024
+  max_align_ids: 4096
+seeds: [42, 7, 18]
+output_dir: "sailrec/outputs/cross_dataset/yelp"

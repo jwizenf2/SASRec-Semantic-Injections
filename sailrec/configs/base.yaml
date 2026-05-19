@@ -1,0 +1,6 @@
+# Shared defaults. Per-experiment configs override individual keys.
+seeds: [42, 7, 18]
+device: "mps"   # override to "cpu" or "cuda" as needed
+tracking:
+  wandb_project: "injection-surfaces-sasrec"
+  wandb_entity: null
