@@ -1,12 +1,10 @@
 # Where LLM Knowledge Belongs
 
-Code for the NeurIPS 2026 paper:
+Code accompanying the paper:
 
-> **Where LLM Knowledge Belongs: A Controlled Study of Semantic Injection Surfaces in SASRec-Style Sequential Recommendation**
+> **[Where LLM Knowledge Belongs: A Controlled Study of Semantic Injection Surfaces in SASRec-Style Sequential Recommendation](paper/where_llm_knowledge_belongs.pdf)**
 
 We compare four surfaces for injecting LLM semantic knowledge into a fixed SASRec backbone — encoder input fusion, per-position distillation, sequence-level alignment, and item-table integration — across Video Games (development benchmark), Sports, Beauty, and Yelp (held-out).
-
-The paper PDF is at `paper/where_llm_knowledge_belongs.pdf`.
 
 ---
 
@@ -17,7 +15,6 @@ SASRec-Semantic-Injections/
 ├── paper/
 │   ├── where_llm_knowledge_belongs.pdf
 │   ├── where_llm_knowledge_belongs.tex
-│   ├── neurips_2026.sty
 │   ├── checklist.tex
 │   └── figures/
 │
@@ -84,10 +81,14 @@ See `data/README.md` for full instructions.
 
 | Dataset | Source | Download |
 |---------|--------|----------|
-| Amazon Video Games | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic |
-| Amazon Beauty | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic |
-| Amazon Sports & Outdoors | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic |
-| Yelp | Yelp Open Dataset (requires free registration) | Manual → `data/yelp/` |
+| Amazon Video Games | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic (first run) |
+| Amazon Beauty & Personal Care | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic (first run) |
+| Amazon Sports & Outdoors | HuggingFace `McAuley-Lab/Amazon-Reviews-2023` | Automatic (first run) |
+| Yelp | Yelp Open Dataset (free registration required) | Manual → `data/yelp/` |
+
+Amazon datasets are pulled via `huggingface_hub.hf_hub_download` from the public `McAuley-Lab/Amazon-Reviews-2023` repo on first use — no HuggingFace login required. Files are cached under `data/amazon-reviews-2023/` so subsequent runs are offline. Each category is a few hundred MB (ratings CSV + raw metadata JSONL).
+
+For Yelp, see `data/README.md` — download the dataset archive, extract `yelp_academic_dataset_{review,business}.json` into `data/yelp/`, then run `prepare_yelp.py`.
 
 All datasets use a 5-core filter and leave-one-out split.
 
