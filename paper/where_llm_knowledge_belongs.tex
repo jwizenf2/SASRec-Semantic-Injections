@@ -704,45 +704,49 @@ already scores near zero on Yelp tail items.
 
 \paragraph{Inside item-table integration.}
 Table~\ref{tab:decomp} walks the $\langle$init, alignment,
-weighting$\rangle$ space on Video Games. The overall H@10 columns
-show that \emph{initialization is the dominant lever}: LLM-PCA
-init lifts sampled overall H@10 from $0.7194$ to $0.7522$, and no
-subsequent combination of alignment or weighting moves overall
-H@10 by more than $\pm 0.003$. The tail columns tell the
-complementary story: init alone lifts sampled tail from $0.2263$
-to $0.2848$, but combining it with frequency-weighted InfoNCE
-alignment goes furthest, reaching sampled tail H@10 of $0.3195$.
-The two ingredients act on orthogonal axes: init dominates overall
-accuracy, frequency-weighted alignment dominates the sampled-tail
+weighting$\rangle$ space on Video Games under sampled@100.
+The overall and head H@10 columns show that
+\emph{initialization is the dominant lever}: LLM-PCA init lifts
+sampled overall H@10 from $0.7194$ to $0.7522$ and head H@10
+from $0.8719$ to $0.8872$, and no subsequent combination of
+alignment or weighting moves either metric by more than
+$\pm 0.004$. The torso and tail columns tell the complementary
+story: init alone lifts sampled tail from $0.2263$ to $0.2848$
+and torso from $0.5188$ to $0.5840$, but combining it with
+frequency-weighted InfoNCE alignment goes furthest, reaching
+sampled tail H@10 of $0.3195$ and torso H@10 of $0.5894$ (the
+best of any configuration in both columns). The two ingredients
+act on orthogonal axes: init dominates head accuracy,
+frequency-weighted alignment dominates the sampled torso and tail
 lift. Figure~\ref{fig:stratified} visualizes the head/torso/tail
 breakdown.
 
 \begin{table}[!htbp]
   \centering
   \footnotesize
-  \caption{Item-table integration decomposition on Video Games.
+  \caption{Item-table integration decomposition on Video Games (Sampled@100).
   ``Init'' is Xavier (vanilla) vs LLM-PCA; ``Align'' is whether
   the symmetric InfoNCE alignment loss is attached to the item
   table; ``Weight'' is the alignment weighting scheme. Overall
-  H@10 is mostly determined by initialization; the tail metric is
-  where alignment, and specifically frequency weighting on top of
-  LLM-PCA, makes the difference. Mean $\pm$ std over seeds
-  $\{7, 18, 42\}$.}
+  H@10 and head H@10 are mostly determined by initialization;
+  torso and tail metrics are where alignment, and specifically
+  frequency weighting on top of LLM-PCA, makes the difference.
+  Mean $\pm$ std over seeds $\{7, 18, 42\}$.}
   \label{tab:decomp}
   \setlength{\tabcolsep}{4pt}
   \resizebox{\linewidth}{!}{%
   \begin{tabular}{lllrrrr}
     \toprule
-    & & & \multicolumn{2}{c}{Sampled@100} & \multicolumn{2}{c}{Full-rank} \\
-    \cmidrule(lr){4-5}\cmidrule(lr){6-7}
-    Init & Align & Weight & Overall H@10 & Tail H@10 & Overall H@10 & Tail H@10 \\
+    & & & \multicolumn{4}{c}{Sampled@100} \\
+    \cmidrule(lr){4-7}
+    Init & Align & Weight & Overall H@10 & Head H@10 & Torso H@10 & Tail H@10 \\
     \midrule
-    Xavier  & ---     & ---     & 0.7194{\tiny$\pm$.0021} & 0.2263{\tiny$\pm$.0052} & 0.0574{\tiny$\pm$.0013} & 0.0004{\tiny$\pm$.0003} \\
-    LLM-PCA & ---     & ---     & 0.7522{\tiny$\pm$.0009} & 0.2848{\tiny$\pm$.0060} & \textbf{0.0776}{\tiny$\pm$.0008} & 0.0003{\tiny$\pm$.0002} \\
-    Xavier  & InfoNCE & uniform & \textbf{0.7572}{\tiny$\pm$.0016} & 0.3114{\tiny$\pm$.0031} & 0.0722{\tiny$\pm$.0002} & 0.0021{\tiny$\pm$.0004} \\
-    LLM-PCA & InfoNCE & uniform & \underline{0.7556}{\tiny$\pm$.0009} & 0.3116{\tiny$\pm$.0019} & 0.0713{\tiny$\pm$.0009} & 0.0013{\tiny$\pm$.0003} \\
-    Xavier  & InfoNCE & freq    & 0.7446{\tiny$\pm$.0012} & \underline{0.3153}{\tiny$\pm$.0017} & 0.0718{\tiny$\pm$.0011} & \textbf{0.0037}{\tiny$\pm$.0003} \\
-    \textbf{LLM-PCA} & \textbf{InfoNCE} & \textbf{freq (ours)} & 0.7539{\tiny$\pm$.0009} & \textbf{0.3195}{\tiny$\pm$.0079} & \underline{0.0775}{\tiny$\pm$.0005} & \underline{0.0022}{\tiny$\pm$.0003} \\
+    Xavier  & ---     & ---     & 0.7194{\tiny$\pm$.0021} & 0.8719{\tiny$\pm$.0004} & 0.5188{\tiny$\pm$.0059} & 0.2263{\tiny$\pm$.0052} \\
+    LLM-PCA & ---     & ---     & 0.7522{\tiny$\pm$.0009} & 0.8872{\tiny$\pm$.0015} & 0.5840{\tiny$\pm$.0037} & 0.2848{\tiny$\pm$.0060} \\
+    Xavier  & InfoNCE & uniform & \textbf{0.7572}{\tiny$\pm$.0016} & \textbf{0.8909}{\tiny$\pm$.0006} & \underline{0.5854}{\tiny$\pm$.0038} & 0.3114{\tiny$\pm$.0031} \\
+    LLM-PCA & InfoNCE & uniform & \underline{0.7556}{\tiny$\pm$.0009} & \underline{0.8900}{\tiny$\pm$.0018} & 0.5816{\tiny$\pm$.0019} & 0.3116{\tiny$\pm$.0017} \\
+    Xavier  & InfoNCE & freq    & 0.7446{\tiny$\pm$.0012} & 0.8768{\tiny$\pm$.0013} & 0.5711{\tiny$\pm$.0018} & \underline{0.3153}{\tiny$\pm$.0060} \\
+    \textbf{LLM-PCA} & \textbf{InfoNCE} & \textbf{freq (ours)} & 0.7539{\tiny$\pm$.0009} & 0.8836{\tiny$\pm$.0016} & \textbf{0.5894}{\tiny$\pm$.0028} & \textbf{0.3195}{\tiny$\pm$.0064} \\
     \bottomrule
   \end{tabular}}%
 \end{table}
@@ -752,7 +756,7 @@ Under sampled@100, where absolute numbers are interpretable,
 item-table integration lifts Video Games tail H@10 from
 $0.2263$ (SASRec) to $0.3195$, a $1.4\times$ relative improvement
 on top of an already non-trivial baseline; head items move
-slightly from $0.8719$ to $0.8834$.
+slightly from $0.8719$ to $0.8836$.
 Figure~\ref{fig:stratified} visualizes the sampled@100
 head/torso/tail breakdown across decomposition configurations.
 LLM-PCA init lifts head and torso items; frequency-weighted
